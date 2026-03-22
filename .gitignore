@@ -1,4 +1,4 @@
-__pycache__
+/__pycache__
 *.pyc
 *.pyo
 *.pyd
@@ -21,5 +21,9 @@ var/
 .installed.cfg
 *.egg
 
-/__pycache__/
+/__pycache__
 /.venv
+
+/paper.tex
+references.bib
+
