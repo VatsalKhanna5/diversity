@@ -26,21 +26,20 @@ def _run_module_as_main(mod_name: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run all SCIRS experiments.")
-    parser.add_argument(
-        "--paper-pack",
-        action="store_true",
-        help="Also collect generated artifacts into paper/figures and paper/tables.",
-    )
-    parser.add_argument(
-        "--strict-pack",
-        action="store_true",
-        help="When used with --paper-pack, fail if any expected artifact is missing.",
-    )
+    parser.add_argument("--paper-pack", action="store_true", help="Copy generated artifacts into paper-ready paths.")
+    parser.add_argument("--strict-pack", action="store_true", help="With --paper-pack, fail if artifacts are missing.")
+    parser.add_argument("--final-plots", action="store_true", help="Generate polished final paper plots from result files.")
     args = parser.parse_args()
 
     for mod_name in EXPERIMENT_MODULES:
         print(f"[RUN] {mod_name}")
         _run_module_as_main(mod_name)
+
+    if args.final_plots:
+        from experiments.final_paper_plots import main as final_plots_main
+
+        print("[RUN] experiments.final_paper_plots")
+        final_plots_main()
 
     if args.paper_pack:
         from experiments.paper_pack import pack_artifacts

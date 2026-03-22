@@ -36,22 +36,40 @@
     0.0
   ],
   "ser": [
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0
+    0.8302,
+    0.8092,
+    0.7902666666666667,
+    0.7737333333333334,
+    0.7633333333333333,
+    0.7571133333333333,
+    0.7514333333333333,
+    0.7501033333333332,
+    0.7496666666666667,
+    0.7495266666666667,
+    0.7494966666666666,
+    0.7494833333333334,
+    0.74948,
+    0.74948,
+    0.74948,
+    0.74948
+  ],
+  "ber_ci95": [
+    0.0042841931692106355,
+    0.002910084840305826,
+    0.0012205273905616018,
+    0.0014133760999818833,
+    0.0005907159497874867,
+    0.00018757039567408678,
+    0.00019392924635699648,
+    4.9325584977102226e-05,
+    2.6738819054783327e-05,
+    3.266666666666666e-06,
+    5.658032638058333e-06,
+    6.533333333333334e-06,
+    3.266666666666667e-06,
+    0.0,
+    0.0,
+    0.0
   ],
   "scheme": "mrc_3x1",
   "config": {
@@ -91,15 +109,15 @@
       "plot": true
     }
   },
-  "runtime_s": 1.6685794000004535,
+  "runtime_s": 1.4422938999996404,
   "seed_runs": [
     {
       "snr_db": 0.0,
       "ber": 0.0894,
-      "ser": 1.0,
+      "ser": 0.8318,
       "bit_errors": 894,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 4159,
       "total_symbols": 5000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -107,10 +125,10 @@
     {
       "snr_db": 0.0,
       "ber": 0.0904,
-      "ser": 1.0,
+      "ser": 0.8334,
       "bit_errors": 904,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 4167,
       "total_symbols": 5000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -118,10 +136,10 @@
     {
       "snr_db": 0.0,
       "ber": 0.0834,
-      "ser": 1.0,
+      "ser": 0.8254,
       "bit_errors": 834,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 4127,
       "total_symbols": 5000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -129,10 +147,10 @@
     {
       "snr_db": 2.0,
       "ber": 0.0651,
-      "ser": 1.0,
+      "ser": 0.8134,
       "bit_errors": 651,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 4067,
       "total_symbols": 5000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -140,10 +158,10 @@
     {
       "snr_db": 2.0,
       "ber": 0.0643,
-      "ser": 1.0,
+      "ser": 0.8094,
       "bit_errors": 643,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 4047,
       "total_symbols": 5000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -151,10 +169,10 @@
     {
       "snr_db": 2.0,
       "ber": 0.0603,
-      "ser": 1.0,
+      "ser": 0.8048,
       "bit_errors": 603,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 4024,
       "total_symbols": 5000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -162,10 +180,10 @@
     {
       "snr_db": 4.0,
       "ber": 0.0426,
-      "ser": 1.0,
+      "ser": 0.795,
       "bit_errors": 426,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 3975,
       "total_symbols": 5000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -173,10 +191,10 @@
     {
       "snr_db": 4.0,
       "ber": 0.0409,
-      "ser": 1.0,
+      "ser": 0.789,
       "bit_errors": 409,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 3945,
       "total_symbols": 5000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -184,10 +202,10 @@
     {
       "snr_db": 4.0,
       "ber": 0.0406,
-      "ser": 1.0,
+      "ser": 0.7868,
       "bit_errors": 406,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 3934,
       "total_symbols": 5000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -195,10 +213,10 @@
     {
       "snr_db": 6.0,
       "ber": 0.0245,
-      "ser": 1.0,
+      "ser": 0.7802,
       "bit_errors": 245,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 3901,
       "total_symbols": 5000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -206,10 +224,10 @@
     {
       "snr_db": 6.0,
       "ber": 0.0251,
-      "ser": 1.0,
+      "ser": 0.773,
       "bit_errors": 251,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 3865,
       "total_symbols": 5000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -217,10 +235,10 @@
     {
       "snr_db": 6.0,
       "ber": 0.0227,
-      "ser": 1.0,
+      "ser": 0.768,
       "bit_errors": 227,
       "total_bits": 10000,
-      "symbol_errors": 5000,
+      "symbol_errors": 3840,
       "total_symbols": 5000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -228,10 +246,10 @@
     {
       "snr_db": 8.0,
       "ber": 0.0119,
-      "ser": 1.0,
+      "ser": 0.7665,
       "bit_errors": 238,
       "total_bits": 20000,
-      "symbol_errors": 10000,
+      "symbol_errors": 7665,
       "total_symbols": 10000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -239,10 +257,10 @@
     {
       "snr_db": 8.0,
       "ber": 0.0118,
-      "ser": 1.0,
+      "ser": 0.7595,
       "bit_errors": 236,
       "total_bits": 20000,
-      "symbol_errors": 10000,
+      "symbol_errors": 7595,
       "total_symbols": 10000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -250,10 +268,10 @@
     {
       "snr_db": 8.0,
       "ber": 0.01275,
-      "ser": 1.0,
+      "ser": 0.764,
       "bit_errors": 255,
       "total_bits": 20000,
-      "symbol_errors": 10000,
+      "symbol_errors": 7640,
       "total_symbols": 10000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -261,10 +279,10 @@
     {
       "snr_db": 10.0,
       "ber": 0.00482,
-      "ser": 1.0,
+      "ser": 0.75912,
       "bit_errors": 241,
       "total_bits": 50000,
-      "symbol_errors": 25000,
+      "symbol_errors": 18978,
       "total_symbols": 25000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -272,10 +290,10 @@
     {
       "snr_db": 10.0,
       "ber": 0.00486,
-      "ser": 1.0,
+      "ser": 0.75592,
       "bit_errors": 243,
       "total_bits": 50000,
-      "symbol_errors": 25000,
+      "symbol_errors": 18898,
       "total_symbols": 25000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -283,10 +301,10 @@
     {
       "snr_db": 10.0,
       "ber": 0.005125,
-      "ser": 1.0,
+      "ser": 0.7563,
       "bit_errors": 205,
       "total_bits": 40000,
-      "symbol_errors": 20000,
+      "symbol_errors": 15126,
       "total_symbols": 20000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -294,10 +312,10 @@
     {
       "snr_db": 12.0,
       "ber": 0.0017083333333333334,
-      "ser": 1.0,
+      "ser": 0.7520833333333333,
       "bit_errors": 205,
       "total_bits": 120000,
-      "symbol_errors": 60000,
+      "symbol_errors": 45125,
       "total_symbols": 60000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -305,10 +323,10 @@
     {
       "snr_db": 12.0,
       "ber": 0.0017666666666666666,
-      "ser": 1.0,
+      "ser": 0.7531166666666667,
       "bit_errors": 212,
       "total_bits": 120000,
-      "symbol_errors": 60000,
+      "symbol_errors": 45187,
       "total_symbols": 60000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -316,10 +334,10 @@
     {
       "snr_db": 12.0,
       "ber": 0.00203,
-      "ser": 1.0,
+      "ser": 0.7491,
       "bit_errors": 203,
       "total_bits": 100000,
-      "symbol_errors": 50000,
+      "symbol_errors": 37455,
       "total_symbols": 50000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -327,10 +345,10 @@
     {
       "snr_db": 14.0,
       "ber": 0.000655,
-      "ser": 1.0,
+      "ser": 0.74988,
       "bit_errors": 131,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74988,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -338,10 +356,10 @@
     {
       "snr_db": 14.0,
       "ber": 0.000585,
-      "ser": 1.0,
+      "ser": 0.75142,
       "bit_errors": 117,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75142,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -349,10 +367,10 @@
     {
       "snr_db": 14.0,
       "ber": 0.000665,
-      "ser": 1.0,
+      "ser": 0.74901,
       "bit_errors": 133,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74901,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -360,10 +378,10 @@
     {
       "snr_db": 16.0,
       "ber": 0.000205,
-      "ser": 1.0,
+      "ser": 0.7494,
       "bit_errors": 41,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74940,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -371,10 +389,10 @@
     {
       "snr_db": 16.0,
       "ber": 0.000195,
-      "ser": 1.0,
+      "ser": 0.75104,
       "bit_errors": 39,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75104,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -382,10 +400,10 @@
     {
       "snr_db": 16.0,
       "ber": 0.00016,
-      "ser": 1.0,
+      "ser": 0.74856,
       "bit_errors": 32,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74856,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -393,10 +411,10 @@
     {
       "snr_db": 18.0,
       "ber": 4.5e-05,
-      "ser": 1.0,
+      "ser": 0.74927,
       "bit_errors": 9,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74927,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -404,10 +422,10 @@
     {
       "snr_db": 18.0,
       "ber": 4e-05,
-      "ser": 1.0,
+      "ser": 0.75083,
       "bit_errors": 8,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75083,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -415,10 +433,10 @@
     {
       "snr_db": 18.0,
       "ber": 4.5e-05,
-      "ser": 1.0,
+      "ser": 0.74848,
       "bit_errors": 9,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74848,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -426,10 +444,10 @@
     {
       "snr_db": 20.0,
       "ber": 2e-05,
-      "ser": 1.0,
+      "ser": 0.74923,
       "bit_errors": 4,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74923,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -437,10 +455,10 @@
     {
       "snr_db": 20.0,
       "ber": 1e-05,
-      "ser": 1.0,
+      "ser": 0.7508,
       "bit_errors": 2,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75080,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -448,10 +466,10 @@
     {
       "snr_db": 20.0,
       "ber": 1.5e-05,
-      "ser": 1.0,
+      "ser": 0.74846,
       "bit_errors": 3,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74846,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -459,10 +477,10 @@
     {
       "snr_db": 22.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74921,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74921,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -470,10 +488,10 @@
     {
       "snr_db": 22.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.75078,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75078,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -481,10 +499,10 @@
     {
       "snr_db": 22.0,
       "ber": 1e-05,
-      "ser": 1.0,
+      "ser": 0.74846,
       "bit_errors": 2,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74846,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -492,10 +510,10 @@
     {
       "snr_db": 24.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74921,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74921,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -503,10 +521,10 @@
     {
       "snr_db": 24.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.75078,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75078,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -514,10 +532,10 @@
     {
       "snr_db": 24.0,
       "ber": 5e-06,
-      "ser": 1.0,
+      "ser": 0.74845,
       "bit_errors": 1,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74845,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -525,10 +543,10 @@
     {
       "snr_db": 26.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74921,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74921,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -536,10 +554,10 @@
     {
       "snr_db": 26.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.75078,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75078,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -547,10 +565,10 @@
     {
       "snr_db": 26.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74845,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74845,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -558,10 +576,10 @@
     {
       "snr_db": 28.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74921,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74921,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -569,10 +587,10 @@
     {
       "snr_db": 28.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.75078,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75078,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -580,10 +598,10 @@
     {
       "snr_db": 28.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74845,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74845,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"
@@ -591,10 +609,10 @@
     {
       "snr_db": 30.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74921,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74921,
       "total_symbols": 100000,
       "seed": 42,
       "scheme": "mrc_3x1"
@@ -602,10 +620,10 @@
     {
       "snr_db": 30.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.75078,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 75078,
       "total_symbols": 100000,
       "seed": 43,
       "scheme": "mrc_3x1"
@@ -613,10 +631,10 @@
     {
       "snr_db": 30.0,
       "ber": 0.0,
-      "ser": 1.0,
+      "ser": 0.74845,
       "bit_errors": 0,
       "total_bits": 200000,
-      "symbol_errors": 100000,
+      "symbol_errors": 74845,
       "total_symbols": 100000,
       "seed": 44,
       "scheme": "mrc_3x1"

@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-03-22T14:38:39.462357+00:00",
+  "created_utc": "2026-03-22T14:50:28.989356+00:00",
   "copied": [
     {
       "kind": "figure",
@@ -37,6 +37,31 @@
       "target": "paper\\figures\\Fig07_qpsk_rotation_constellation.png"
     },
     {
+      "kind": "figure",
+      "source": "paper\\figures\\Fig10_main_ber_comparison.png",
+      "target": "paper\\figures\\Fig10_main_ber_comparison.png"
+    },
+    {
+      "kind": "figure",
+      "source": "paper\\figures\\Fig11_scirs3x1_gain.png",
+      "target": "paper\\figures\\Fig11_scirs3x1_gain.png"
+    },
+    {
+      "kind": "figure",
+      "source": "paper\\figures\\Fig12_correlation_robustness.png",
+      "target": "paper\\figures\\Fig12_correlation_robustness.png"
+    },
+    {
+      "kind": "figure",
+      "source": "paper\\figures\\Fig13_rotation_sweep.png",
+      "target": "paper\\figures\\Fig13_rotation_sweep.png"
+    },
+    {
+      "kind": "figure",
+      "source": "paper\\figures\\Fig14_complexity_comparison.png",
+      "target": "paper\\figures\\Fig14_complexity_comparison.png"
+    },
+    {
       "kind": "table",
       "source": "paper\\tables\\exp01_baseline_table.md",
       "target": "paper\\tables\\Table01_baseline_snr_targets.md"
@@ -58,5 +83,5 @@
     }
   ],
   "missing": [],
-  "strict": false
+  "strict": true
 }

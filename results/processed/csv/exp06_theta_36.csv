@@ -1,2 +1,2 @@
-snr_db,ber,ser,bit_errors,total_bits,scheme,n_symbols,seeds
-10.0,0.3562,0.9330666666666666,10686,30000,scirs_2x1,100000,42|43|44
+snr_db,ber,ser,ber_std,ser_std,ber_ci95,bit_errors,total_bits,scheme,n_symbols,seeds
+10.0,0.26143333333333335,0.9288,0.0015044378795195706,0.005102940328869225,0.0017024317248506,7843,30000,scirs_2x1,100000,42|43|44

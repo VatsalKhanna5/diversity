@@ -45,18 +45,18 @@ def _run_alamouti(syms: np.ndarray, cfg: dict, snr_db: float) -> tuple[np.ndarra
 
 
 def _run_scirs_2x1(syms: np.ndarray, cfg: dict, snr_db: float, constellation: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    x, meta = scirs_2x1.transmit(syms, cfg)
-    h = _channel_sample(cfg, x.shape[0], 2)
-    y = np.sum(h * x, axis=1)
+    tx, meta = scirs_2x1.transmit(syms, cfg)
+    h = _channel_sample(cfg, tx.shape[0], 2)
+    y = np.sum(h[:, None, :] * tx, axis=2)
     y_n = noise.add_awgn(y, snr_db)
     s_hat = scirs_2x1.receive(y_n, h, cfg, constellation)
     return s_hat, syms[: meta["n_used_symbols"]]
 
 
 def _run_scirs_3x1(syms: np.ndarray, cfg: dict, snr_db: float, constellation: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    x, meta = scirs_3x1.transmit(syms, cfg)
-    h = _channel_sample(cfg, x.shape[0], 3)
-    y = np.sum(h * x, axis=1)
+    tx, meta = scirs_3x1.transmit(syms, cfg)
+    h = _channel_sample(cfg, tx.shape[0], 3)
+    y = np.sum(h[:, None, :] * tx, axis=2)
     y_n = noise.add_awgn(y, snr_db)
     s_hat = scirs_3x1.receive(y_n, h, cfg, constellation)
     return s_hat, syms[: meta["n_used_symbols"]]
@@ -98,10 +98,12 @@ def run_single_snr(cfg: dict, snr_db: float, seed: int) -> dict:
 
         bits_used = mapper.demodulate(syms_used)
         rx_bits = mapper.demodulate(s_hat)
+        decided_syms = mapper.modulate(rx_bits)
+
         bit_errors += int(np.sum(bits_used != rx_bits))
         total_bits += int(bits_used.size)
 
-        sym_errors += int(np.sum(np.abs(syms_used - s_hat) > 1e-6))
+        sym_errors += int(np.sum(np.abs(syms_used - decided_syms) > 1e-12))
         total_syms += int(len(syms_used))
 
     return {

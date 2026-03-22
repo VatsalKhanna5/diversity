@@ -15,6 +15,11 @@ FIGURE_MAP = {
     "results/plots/comparison/exp06_rotation_sweep.png": "paper/figures/Fig05_rotation_sweep.png",
     "results/plots/comparison/exp07_complexity_runtime.png": "paper/figures/Fig06_runtime_complexity.png",
     "results/plots/constellation/exp08_qpsk_rotation.png": "paper/figures/Fig07_qpsk_rotation_constellation.png",
+    "paper/figures/Fig10_main_ber_comparison.png": "paper/figures/Fig10_main_ber_comparison.png",
+    "paper/figures/Fig11_scirs3x1_gain.png": "paper/figures/Fig11_scirs3x1_gain.png",
+    "paper/figures/Fig12_correlation_robustness.png": "paper/figures/Fig12_correlation_robustness.png",
+    "paper/figures/Fig13_rotation_sweep.png": "paper/figures/Fig13_rotation_sweep.png",
+    "paper/figures/Fig14_complexity_comparison.png": "paper/figures/Fig14_complexity_comparison.png",
 }
 
 TABLE_MAP = {
@@ -38,7 +43,8 @@ def _copy_map(path_map: dict[str, str], strict: bool, kind: str) -> tuple[list[d
             continue
 
         dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
+        if src.resolve() != dst.resolve():
+            shutil.copy2(src, dst)
         copied.append({"kind": kind, "source": str(src), "target": str(dst)})
 
     if strict and missing:

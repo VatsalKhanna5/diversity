@@ -12,6 +12,7 @@ from src.pipeline.evaluator import make_snr_grid, save_csv
 from src.pipeline.simulate import run_single_snr
 from src.utils.config_loader import load_config
 from src.utils.logger import build_logger, save_json
+from src.utils.plot_style import apply_publication_style
 
 
 def _run_job(cfg: dict, snr: float, seed: int) -> dict:
@@ -19,15 +20,24 @@ def _run_job(cfg: dict, snr: float, seed: int) -> dict:
 
 
 def _plot_curve(payload: dict, out_path: Path) -> None:
-    plt.figure(figsize=(7, 5))
-    plt.semilogy(payload["snr_db"], payload["ber"], marker="o", label=payload["scheme"])
+    apply_publication_style()
+
+    snr = np.asarray(payload["snr_db"], dtype=float)
+    ber = np.asarray(payload["ber"], dtype=float)
+    ci95 = np.asarray(payload["ber_ci95"], dtype=float)
+
+    plt.figure()
+    plt.semilogy(snr, ber, marker="o", lw=2, label=payload["scheme"])
+    lower = np.clip(ber - ci95, 1e-8, None)
+    upper = np.clip(ber + ci95, 1e-8, None)
+    plt.fill_between(snr, lower, upper, alpha=0.18, label="95% CI")
     plt.xlabel("SNR (dB)")
-    plt.ylabel("BER")
-    plt.grid(True, which="both", ls="--", alpha=0.5)
+    plt.ylabel("Bit Error Rate")
+    plt.title(f"BER vs SNR: {payload['scheme']}")
+    plt.ylim(bottom=1e-7)
     plt.legend()
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=240)
+    plt.savefig(out_path)
     plt.close()
 
 
@@ -56,10 +66,22 @@ def run_experiment_config(cfg: dict, output_tag: str | None = None) -> dict:
     all_rows: list[dict] = []
     for snr in snr_grid:
         snr_runs = [r for r in per_run if abs(r["snr_db"] - float(snr)) < 1e-9]
+        ber_samples = np.asarray([r["ber"] for r in snr_runs], dtype=float)
+        ser_samples = np.asarray([r["ser"] for r in snr_runs], dtype=float)
+
+        ber_mean = float(np.mean(ber_samples))
+        ser_mean = float(np.mean(ser_samples))
+        ber_std = float(np.std(ber_samples, ddof=1)) if len(ber_samples) > 1 else 0.0
+        ser_std = float(np.std(ser_samples, ddof=1)) if len(ser_samples) > 1 else 0.0
+        ci95 = 1.96 * ber_std / np.sqrt(max(len(ber_samples), 1))
+
         row = {
             "snr_db": float(snr),
-            "ber": float(np.mean([r["ber"] for r in snr_runs])),
-            "ser": float(np.mean([r["ser"] for r in snr_runs])),
+            "ber": ber_mean,
+            "ser": ser_mean,
+            "ber_std": ber_std,
+            "ser_std": ser_std,
+            "ber_ci95": float(ci95),
             "bit_errors": int(np.sum([r["bit_errors"] for r in snr_runs])),
             "total_bits": int(np.sum([r["total_bits"] for r in snr_runs])),
             "scheme": cfg.get("scheme", "unknown"),
@@ -67,7 +89,13 @@ def run_experiment_config(cfg: dict, output_tag: str | None = None) -> dict:
             "seeds": "|".join(str(s) for s in seeds),
         }
         all_rows.append(row)
-        logger.info("scheme=%s snr=%.1f ber=%.3e", row["scheme"], snr, row["ber"])
+        logger.info(
+            "scheme=%s snr=%.1f ber=%.3e +/- %.1e",
+            row["scheme"],
+            snr,
+            row["ber"],
+            row["ber_ci95"],
+        )
 
     runtime_s = time.perf_counter() - t0
     tag = output_tag or cfg.get("scheme", "experiment")
@@ -76,6 +104,7 @@ def run_experiment_config(cfg: dict, output_tag: str | None = None) -> dict:
         "snr_db": [r["snr_db"] for r in all_rows],
         "ber": [r["ber"] for r in all_rows],
         "ser": [r["ser"] for r in all_rows],
+        "ber_ci95": [r["ber_ci95"] for r in all_rows],
         "scheme": cfg.get("scheme", "unknown"),
         "config": cfg,
         "runtime_s": float(runtime_s),
@@ -95,10 +124,18 @@ def run_experiment_config(cfg: dict, output_tag: str | None = None) -> dict:
         snr_db=np.asarray(payload["snr_db"], dtype=float),
         ber=np.asarray(payload["ber"], dtype=float),
         ser=np.asarray(payload["ser"], dtype=float),
+        ber_ci95=np.asarray(payload["ber_ci95"], dtype=float),
     )
     _plot_curve(payload, plot_path)
 
-    logger.info("saved json=%s csv=%s npz=%s plot=%s runtime=%.2fs", raw_path, csv_path, npy_path, plot_path, runtime_s)
+    logger.info(
+        "saved json=%s csv=%s npz=%s plot=%s runtime=%.2fs",
+        raw_path,
+        csv_path,
+        npy_path,
+        plot_path,
+        runtime_s,
+    )
     return payload
 
 

@@ -4,60 +4,62 @@ import itertools
 
 import numpy as np
 
-from src.schemes.rotation import rotation_matrix_3x3
+from src.schemes.rotation import rotate_iq
 
 
-def _interleave_triplet(s1: np.ndarray, s2: np.ndarray, s3: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    v1 = np.real(s1) + 1j * np.imag(s2)
-    v2 = np.real(s2) + 1j * np.imag(s3)
-    v3 = np.real(s3) + 1j * np.imag(s1)
-    return v1, v2, v3
-
-
-def _deinterleave_triplet(v1: np.ndarray, v2: np.ndarray, v3: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    s1 = np.real(v1) + 1j * np.imag(v3)
-    s2 = np.real(v2) + 1j * np.imag(v1)
-    s3 = np.real(v3) + 1j * np.imag(v2)
-    return s1, s2, s3
+def _ciod3_map(r1: np.ndarray, r2: np.ndarray, r3: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    u1 = np.real(r1) + 1j * np.imag(r2)
+    u2 = np.real(r2) + 1j * np.imag(r3)
+    u3 = np.real(r3) + 1j * np.imag(r1)
+    return u1, u2, u3
 
 
 def transmit(symbols: np.ndarray, config: dict) -> tuple[np.ndarray, dict]:
     theta = np.deg2rad(float(config.get("rotation", {}).get("theta_deg", 35.0)))
-    g = rotation_matrix_3x3(theta)
 
-    n_groups = len(symbols) // 3
-    trimmed = symbols[: 3 * n_groups]
-    groups = trimmed.reshape(-1, 3)
+    n_blocks = len(symbols) // 3
+    used = symbols[: 3 * n_blocks].reshape(-1, 3)
+    r1 = rotate_iq(used[:, 0], theta)
+    r2 = rotate_iq(used[:, 1], theta)
+    r3 = rotate_iq(used[:, 2], theta)
 
-    v1, v2, v3 = _interleave_triplet(groups[:, 0], groups[:, 1], groups[:, 2])
-    v = np.column_stack([v1, v2, v3])
-    x = v @ g.T
-    x = x / np.sqrt(np.mean(np.sum(np.abs(x) ** 2, axis=1)))
+    u1, u2, u3 = _ciod3_map(r1, r2, r3)
 
-    meta = {
-        "theta": theta,
-        "n_used_symbols": int(3 * n_groups),
-        "rotation": g,
-    }
-    return x, meta
+    tx = np.zeros((n_blocks, 3, 3), dtype=complex)
+    tx[:, 0, 0] = u1
+    tx[:, 1, 1] = u2
+    tx[:, 2, 2] = u3
+
+    norm = np.sqrt(np.mean(np.abs(tx) ** 2) * tx.shape[2])
+    tx /= max(norm, 1e-12)
+
+    return tx, {"n_used_symbols": int(3 * n_blocks), "theta_deg": np.rad2deg(theta)}
 
 
-def _candidate_tx(constellation: np.ndarray, theta: float) -> tuple[np.ndarray, np.ndarray]:
-    g = rotation_matrix_3x3(theta)
+def _candidate_blocks(constellation: np.ndarray, theta: float) -> tuple[np.ndarray, np.ndarray]:
     groups = np.asarray(list(itertools.product(constellation, repeat=3)), dtype=complex)
-    v1, v2, v3 = _interleave_triplet(groups[:, 0], groups[:, 1], groups[:, 2])
-    v = np.column_stack([v1, v2, v3])
-    x = v @ g.T
-    x = x / np.sqrt(np.mean(np.sum(np.abs(x) ** 2, axis=1)))
-    return groups, x
+    r1 = rotate_iq(groups[:, 0], theta)
+    r2 = rotate_iq(groups[:, 1], theta)
+    r3 = rotate_iq(groups[:, 2], theta)
+
+    u1, u2, u3 = _ciod3_map(r1, r2, r3)
+
+    tx = np.zeros((len(groups), 3, 3), dtype=complex)
+    tx[:, 0, 0] = u1
+    tx[:, 1, 1] = u2
+    tx[:, 2, 2] = u3
+    norm = np.sqrt(np.mean(np.abs(tx) ** 2) * tx.shape[2])
+    tx /= max(norm, 1e-12)
+
+    return groups, tx
 
 
 def receive(rx_signal: np.ndarray, channel: np.ndarray, config: dict, constellation: np.ndarray) -> np.ndarray:
     theta = np.deg2rad(float(config.get("rotation", {}).get("theta_deg", 35.0)))
-    groups, x_candidates = _candidate_tx(constellation, theta)
+    groups, tx_candidates = _candidate_blocks(constellation, theta)
 
-    pred = np.sum(channel[:, None, :] * x_candidates[None, :, :], axis=2)
-    metric = np.abs(rx_signal[:, None] - pred) ** 2
+    pred = np.sum(channel[:, None, None, :] * tx_candidates[None, :, :, :], axis=3)
+    metric = np.sum(np.abs(rx_signal[:, None, :] - pred) ** 2, axis=2)
+
     idx = np.argmin(metric, axis=1)
-    s_hat = groups[idx]
-    return s_hat.reshape(-1)
+    return groups[idx].reshape(-1)

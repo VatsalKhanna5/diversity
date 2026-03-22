@@ -4,58 +4,57 @@ import itertools
 
 import numpy as np
 
-from src.schemes.rotation import rotation_matrix_2d
+from src.schemes.rotation import rotate_iq
 
 
-def _interleave_pair(s1: np.ndarray, s2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    v1 = np.real(s1) + 1j * np.imag(s2)
-    v2 = np.real(s2) + 1j * np.imag(s1)
-    return v1, v2
-
-
-def _deinterleave_pair(v1: np.ndarray, v2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    s1 = np.real(v1) + 1j * np.imag(v2)
-    s2 = np.real(v2) + 1j * np.imag(v1)
-    return s1, s2
+def _ciod_map(r1: np.ndarray, r2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    u1 = np.real(r1) + 1j * np.imag(r2)
+    u2 = np.real(r2) + 1j * np.imag(r1)
+    return u1, u2
 
 
 def transmit(symbols: np.ndarray, config: dict) -> tuple[np.ndarray, dict]:
     theta = np.deg2rad(float(config.get("rotation", {}).get("theta_deg", 31.7175)))
-    g = rotation_matrix_2d(theta)
 
-    n_pairs = len(symbols) // 2
-    trimmed = symbols[: 2 * n_pairs]
-    pairs = trimmed.reshape(-1, 2)
+    n_blocks = len(symbols) // 2
+    used = symbols[: 2 * n_blocks].reshape(-1, 2)
+    r1 = rotate_iq(used[:, 0], theta)
+    r2 = rotate_iq(used[:, 1], theta)
 
-    v1, v2 = _interleave_pair(pairs[:, 0], pairs[:, 1])
-    v = np.column_stack([v1, v2])
-    x = v @ g.T
-    x = x / np.sqrt(np.mean(np.sum(np.abs(x) ** 2, axis=1)))
+    u1, u2 = _ciod_map(r1, r2)
 
-    meta = {
-        "theta": theta,
-        "n_used_symbols": int(2 * n_pairs),
-        "rotation": g,
-    }
-    return x, meta
+    tx = np.zeros((n_blocks, 2, 2), dtype=complex)
+    tx[:, 0, 0] = u1
+    tx[:, 1, 1] = u2
+
+    norm = np.sqrt(np.mean(np.abs(tx) ** 2) * tx.shape[2])
+    tx /= max(norm, 1e-12)
+
+    return tx, {"n_used_symbols": int(2 * n_blocks), "theta_deg": np.rad2deg(theta)}
 
 
-def _candidate_tx(constellation: np.ndarray, theta: float) -> tuple[np.ndarray, np.ndarray]:
-    g = rotation_matrix_2d(theta)
+def _candidate_blocks(constellation: np.ndarray, theta: float) -> tuple[np.ndarray, np.ndarray]:
     pairs = np.asarray(list(itertools.product(constellation, repeat=2)), dtype=complex)
-    v1, v2 = _interleave_pair(pairs[:, 0], pairs[:, 1])
-    v = np.column_stack([v1, v2])
-    x = v @ g.T
-    x = x / np.sqrt(np.mean(np.sum(np.abs(x) ** 2, axis=1)))
-    return pairs, x
+    r1 = rotate_iq(pairs[:, 0], theta)
+    r2 = rotate_iq(pairs[:, 1], theta)
+    u1, u2 = _ciod_map(r1, r2)
+
+    tx = np.zeros((len(pairs), 2, 2), dtype=complex)
+    tx[:, 0, 0] = u1
+    tx[:, 1, 1] = u2
+    norm = np.sqrt(np.mean(np.abs(tx) ** 2) * tx.shape[2])
+    tx /= max(norm, 1e-12)
+
+    return pairs, tx
 
 
 def receive(rx_signal: np.ndarray, channel: np.ndarray, config: dict, constellation: np.ndarray) -> np.ndarray:
     theta = np.deg2rad(float(config.get("rotation", {}).get("theta_deg", 31.7175)))
-    pairs, x_candidates = _candidate_tx(constellation, theta)
+    pairs, tx_candidates = _candidate_blocks(constellation, theta)
 
-    pred = np.sum(channel[:, None, :] * x_candidates[None, :, :], axis=2)
-    metric = np.abs(rx_signal[:, None] - pred) ** 2
+    # rx_signal: [n_blocks, 2], channel: [n_blocks, 2], tx_candidates: [n_cand, 2, 2]
+    pred = np.sum(channel[:, None, None, :] * tx_candidates[None, :, :, :], axis=3)
+    metric = np.sum(np.abs(rx_signal[:, None, :] - pred) ** 2, axis=2)
+
     idx = np.argmin(metric, axis=1)
-    s_hat = pairs[idx]
-    return s_hat.reshape(-1)
+    return pairs[idx].reshape(-1)
