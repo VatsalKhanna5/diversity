@@ -1,0 +1,29 @@
+seed: 42
+modulation: qpsk
+scheme: siso
+n_tx: 1
+n_rx: 1
+snr_db:
+  start: 0
+  stop: 30
+  step: 2
+n_symbols: 100000
+max_errors: 200
+batch_size: 5000
+seeds:
+  - 42
+  - 43
+  - 44
+parallel:
+  enabled: false
+  workers: 4
+channel:
+  type: rayleigh
+  correlation_rho: 0.0
+receiver:
+  detector: ml
+output:
+  save_raw_json: true
+  save_csv: true
+  save_numpy: true
+  plot: true

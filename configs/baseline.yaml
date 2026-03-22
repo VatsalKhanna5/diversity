@@ -1,0 +1,7 @@
+extends: base_config.yaml
+scheme: baseline
+baselines:
+  - siso
+  - mrc_2x1
+  - mrc_3x1
+  - alamouti_2x1

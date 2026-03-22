@@ -1,0 +1,6 @@
+extends: base_config.yaml
+scheme: scirs_2x1
+n_tx: 2
+n_rx: 1
+rotation:
+  theta_deg: 31.7175
