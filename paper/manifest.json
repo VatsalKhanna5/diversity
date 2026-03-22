@@ -1,0 +1,62 @@
+{
+  "created_utc": "2026-03-22T14:38:39.462357+00:00",
+  "copied": [
+    {
+      "kind": "figure",
+      "source": "results\\plots\\comparison\\exp01_baseline_compare.png",
+      "target": "paper\\figures\\Fig01_baseline_diversity.png"
+    },
+    {
+      "kind": "figure",
+      "source": "results\\plots\\ber_curves\\exp03_scirs_2x1.png",
+      "target": "paper\\figures\\Fig02_scirs_2x1_ber.png"
+    },
+    {
+      "kind": "figure",
+      "source": "results\\plots\\comparison\\exp04_scirs3x1_vs_mrc3x1.png",
+      "target": "paper\\figures\\Fig03_scirs3x1_vs_mrc3x1.png"
+    },
+    {
+      "kind": "figure",
+      "source": "results\\plots\\comparison\\exp05_correlated.png",
+      "target": "paper\\figures\\Fig04_correlated_channel_robustness.png"
+    },
+    {
+      "kind": "figure",
+      "source": "results\\plots\\comparison\\exp06_rotation_sweep.png",
+      "target": "paper\\figures\\Fig05_rotation_sweep.png"
+    },
+    {
+      "kind": "figure",
+      "source": "results\\plots\\comparison\\exp07_complexity_runtime.png",
+      "target": "paper\\figures\\Fig06_runtime_complexity.png"
+    },
+    {
+      "kind": "figure",
+      "source": "results\\plots\\constellation\\exp08_qpsk_rotation.png",
+      "target": "paper\\figures\\Fig07_qpsk_rotation_constellation.png"
+    },
+    {
+      "kind": "table",
+      "source": "paper\\tables\\exp01_baseline_table.md",
+      "target": "paper\\tables\\Table01_baseline_snr_targets.md"
+    },
+    {
+      "kind": "table",
+      "source": "paper\\tables\\exp01_baseline_table.json",
+      "target": "paper\\tables\\Table01_baseline_snr_targets.json"
+    },
+    {
+      "kind": "table",
+      "source": "paper\\tables\\exp04_scirs3x1_gain.md",
+      "target": "paper\\tables\\Table02_scirs3x1_gain.md"
+    },
+    {
+      "kind": "table",
+      "source": "paper\\tables\\exp04_scirs3x1_gain.json",
+      "target": "paper\\tables\\Table02_scirs3x1_gain.json"
+    }
+  ],
+  "missing": [],
+  "strict": false
+}

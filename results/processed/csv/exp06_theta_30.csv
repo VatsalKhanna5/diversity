@@ -1,0 +1,2 @@
+snr_db,ber,ser,bit_errors,total_bits,scheme,n_symbols,seeds
+10.0,0.3544,0.932,10632,30000,scirs_2x1,100000,42|43|44

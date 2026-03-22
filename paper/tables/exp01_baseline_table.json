@@ -1,0 +1,21 @@
+{
+  "target_ber": 0.001,
+  "rows": [
+    {
+      "scheme": "alamouti_2x1",
+      "snr_at_target_ber": 12.43779577442238
+    },
+    {
+      "scheme": "mrc_3x1",
+      "snr_at_target_ber": 13.144098980630776
+    },
+    {
+      "scheme": "mrc_2x1",
+      "snr_at_target_ber": 15.447519740830764
+    },
+    {
+      "scheme": "siso",
+      "snr_at_target_ber": 23.847366266880595
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "snr_db": [
+    10.0
+  ],
+  "ber": [
+    0.35756666666666664
+  ],
+  "ser": [
+    0.9325333333333333
+  ],
+  "scheme": "scirs_2x1",
+  "config": {
+    "seed": 42,
+    "modulation": "qpsk",
+    "scheme": "scirs_2x1",
+    "n_tx": 2,
+    "n_rx": 1,
+    "snr_db": {
+      "start": 10,
+      "stop": 10,
+      "step": 1
+    },
+    "n_symbols": 100000,
+    "max_errors": 200,
+    "batch_size": 5000,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "parallel": {
+      "enabled": false,
+      "workers": 4
+    },
+    "channel": {
+      "type": "rayleigh",
+      "correlation_rho": 0.0
+    },
+    "receiver": {
+      "detector": "ml"
+    },
+    "output": {
+      "save_raw_json": true,
+      "save_csv": true,
+      "save_numpy": true,
+      "plot": true
+    },
+    "rotation": {
+      "theta_deg": 3.0
+    }
+  },
+  "runtime_s": 0.01951829999961774,
+  "seed_runs": [
+    {
+      "snr_db": 10.0,
+      "ber": 0.3612,
+      "ser": 0.9382,
+      "bit_errors": 3612,
+      "total_bits": 10000,
+      "symbol_errors": 4691,
+      "total_symbols": 5000,
+      "seed": 42,
+      "scheme": "scirs_2x1"
+    },
+    {
+      "snr_db": 10.0,
+      "ber": 0.3575,
+      "ser": 0.926,
+      "bit_errors": 3575,
+      "total_bits": 10000,
+      "symbol_errors": 4630,
+      "total_symbols": 5000,
+      "seed": 43,
+      "scheme": "scirs_2x1"
+    },
+    {
+      "snr_db": 10.0,
+      "ber": 0.354,
+      "ser": 0.9334,
+      "bit_errors": 3540,
+      "total_bits": 10000,
+      "symbol_errors": 4667,
+      "total_symbols": 5000,
+      "seed": 44,
+      "scheme": "scirs_2x1"
+    }
+  ]
+}

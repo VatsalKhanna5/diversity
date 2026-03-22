@@ -29,6 +29,8 @@ python experiments/exp_04_scirs_3x1.py
 
 ```bash
 python experiments/run_all.py
+# or run and automatically collect paper assets
+python experiments/run_all.py --paper-pack
 ```
 
 ## Experiment map
@@ -60,3 +62,15 @@ See `configs/base_config.yaml`:
 - `n_symbols`: symbols per SNR point
 - `max_errors`: early stopping threshold
 - `parallel.enabled/workers`: optional multiprocessing
+
+## Paper Pack
+
+Collect publication assets with standardized names:
+
+```bash
+python experiments/paper_pack.py
+# strict mode: fail if any expected file is missing
+python experiments/paper_pack.py --strict
+```
+
+Manifest is written to `paper/manifest.json`.
