@@ -14,6 +14,8 @@ EXPERIMENT_MODULES = [
     "experiments.exp_06_rotation_sweep",
     "experiments.exp_07_complexity_analysis",
     "experiments.exp_08_constellation_visualization",
+    "experiments.exp_09_main_comparison",
+    "experiments.exp_10_sanity_checks",
 ]
 
 

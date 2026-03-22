@@ -3,13 +3,13 @@
     10.0
   ],
   "ber": [
-    0.2689
+    0.10223333333333333
   ],
   "ser": [
-    0.9218666666666667
+    0.17173333333333338
   ],
   "ber_ci95": [
-    0.0017784592582719798
+    0.004866346656145425
   ],
   "scheme": "scirs_2x1",
   "config": {
@@ -52,37 +52,37 @@
       "theta_deg": 27.0
     }
   },
-  "runtime_s": 0.02480189999914728,
+  "runtime_s": 0.023857700000007753,
   "seed_runs": [
     {
       "snr_db": 10.0,
-      "ber": 0.2692,
-      "ser": 0.921,
-      "bit_errors": 2692,
+      "ber": 0.0979,
+      "ser": 0.1658,
+      "bit_errors": 979,
       "total_bits": 10000,
-      "symbol_errors": 4605,
+      "symbol_errors": 829,
       "total_symbols": 5000,
       "seed": 42,
       "scheme": "scirs_2x1"
     },
     {
       "snr_db": 10.0,
-      "ber": 0.2703,
-      "ser": 0.9258,
-      "bit_errors": 2703,
+      "ber": 0.1065,
+      "ser": 0.1776,
+      "bit_errors": 1065,
       "total_bits": 10000,
-      "symbol_errors": 4629,
+      "symbol_errors": 888,
       "total_symbols": 5000,
       "seed": 43,
       "scheme": "scirs_2x1"
     },
     {
       "snr_db": 10.0,
-      "ber": 0.2672,
-      "ser": 0.9188,
-      "bit_errors": 2672,
+      "ber": 0.1023,
+      "ser": 0.1718,
+      "bit_errors": 1023,
       "total_bits": 10000,
-      "symbol_errors": 4594,
+      "symbol_errors": 859,
       "total_symbols": 5000,
       "seed": 44,
       "scheme": "scirs_2x1"

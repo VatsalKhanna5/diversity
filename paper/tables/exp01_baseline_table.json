@@ -3,19 +3,19 @@
   "rows": [
     {
       "scheme": "alamouti_2x1",
-      "snr_at_target_ber": 12.43779577442238
-    },
-    {
-      "scheme": "mrc_3x1",
-      "snr_at_target_ber": 13.144098980630776
+      "snr_at_target_ber": 14.24534249116758
     },
     {
       "scheme": "mrc_2x1",
-      "snr_at_target_ber": 15.447519740830764
+      "snr_at_target_ber": 26.970322352668145
+    },
+    {
+      "scheme": "mrc_3x1",
+      "snr_at_target_ber": 26.9753156502726
     },
     {
       "scheme": "siso",
-      "snr_at_target_ber": 23.847366266880595
+      "snr_at_target_ber": 27.000920889728732
     }
   ]
 }

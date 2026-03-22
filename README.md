@@ -1,35 +1,134 @@
 # SCIRS Research Framework
 
-A reproducible simulation and reporting framework for evaluating Spatial-Coordinate Interleaved Rotated Signaling (SCIRS) against classical diversity baselines in low-dimensional MIMO/MISO settings.
+This repository implements a research-grade, reproducible Monte Carlo simulator for diversity systems over flat Rayleigh fading, including a mathematically correct implementation of SCIRS (Spatial-Coordinate Interleaved Rotated Signaling) with **joint ML detection**.
 
-## 1) Scope and Purpose
+## 1. Research Objective
 
-This repository is designed for publication-oriented experimentation. It emphasizes:
-
-- strict experiment reproducibility (config + seed logging)
-- modularity across modulation, channel, scheme, and receiver layers
-- statistically meaningful BER/SER evaluation
-- artifact traceability from raw logs to paper figures/tables
-
-Core compared schemes:
+Evaluate BER/SER performance of:
 
 - SISO
 - MRC (2x1, 3x1)
 - Alamouti (2x1)
 - SCIRS (2x1, 3x1)
 
-## 2) Repository Layout
+under:
 
-- `configs/`: YAML configurations for default and experiment-specific runs
-- `src/modulation/`: QPSK / 16QAM mappers and constellation definitions
-- `src/channel/`: Rayleigh and correlated channel models, AWGN
-- `src/schemes/`: MRC, Alamouti, SCIRS encoding/decoding blocks
-- `src/pipeline/`: simulation runner, experiment orchestration, reporting helpers
-- `experiments/`: standalone experiment entry scripts
-- `results/`: generated raw logs, processed numeric outputs, and plots
-- `paper/`: publication-ready figures/tables and packaging manifest
+- i.i.d. Rayleigh fading
+- correlated Rayleigh fading (`rho = 0, 0.5, 0.9`)
 
-## 3) Environment Setup
+for SNR range `0..30 dB`.
+
+## 2. Mathematical Model
+
+For an `Lx1` MISO channel:
+
+- channel vector: `H = [h1, ..., hL]`
+- each `hi ~ CN(0,1)`
+- noise: `n ~ CN(0, N0)`
+- received signal: `y = Hx + n`
+
+Perfect CSI is assumed at the receiver.
+
+## 3. Critical SCIRS Rule
+
+SCIRS is **jointly encoded and jointly decoded**. It is not repetition coding.
+
+- Do not decode symbol coordinates independently.
+- Do not decode per symbol after rotation.
+- Perform ML detection over the **full transmitted symbol vector**.
+
+If implemented incorrectly, BER can saturate near random-guess levels.
+
+## 4. Modulation
+
+QPSK Gray mapping is implemented exactly as:
+
+- `(0,0) -> (1 + j)/sqrt(2)`
+- `(0,1) -> (-1 + j)/sqrt(2)`
+- `(1,1) -> (-1 - j)/sqrt(2)`
+- `(1,0) -> (1 - j)/sqrt(2)`
+
+Average symbol energy is normalized to 1.
+
+## 5. Scheme Implementations
+
+### 5.1 SISO
+
+- model: `y = h s + n`
+- detection: ML over QPSK constellation
+
+### 5.2 MRC (`Lx1`)
+
+- same symbol transmitted from all antennas
+- receive model: `y = sum_i h_i * s + n`
+- equivalent channel: `h_eff = sum_i h_i / sqrt(L)`
+- equalize then ML slice
+
+### 5.3 Alamouti (2x1)
+
+- standard orthogonal STBC:
+  - time 1: `[s1, s2]`
+  - time 2: `[-conj(s2), conj(s1)]`
+- linear combiner with known closed-form decoder
+
+### 5.4 SCIRS 2x1
+
+- symbol vector: `s = [s1, s2]^T`
+- rotated vector: `x = G s`, where
+  - `theta = 0.5 * arctan(2)`
+  - `G = [[cos(theta), -sin(theta)], [sin(theta), cos(theta)]]`
+- single-slot transmission across two antennas
+- joint ML over all `4^2 = 16` QPSK pairs
+
+### 5.5 SCIRS 3x1
+
+- symbol vector: `s = [s1, s2, s3]^T`
+- rotated using deterministic orthonormal `3x3` matrix
+- single-slot transmission across three antennas
+- joint ML over all `4^3 = 64` QPSK triples
+
+## 6. Statistics and Reliability
+
+Per SNR point:
+
+- simulate up to `n_symbols` (default `1e5`)
+- early-stop only after collecting at least `max_errors` (default `200`) bit errors
+- aggregate over multiple seeds
+- report BER mean, SER mean, BER standard deviation, and BER 95% CI
+
+## 7. Correlated Channel Model
+
+Correlation matrix:
+
+- `R_ij = rho^|i-j|`
+
+Channel generation uses Cholesky factorization of `R`.
+
+## 8. Sanity Checks
+
+Built-in checks verify:
+
+- high-SNR BER is low for all schemes
+- BER does not collapse to random-guess region
+
+Run:
+
+```bash
+python experiments/exp_10_sanity_checks.py
+```
+
+## 9. Repository Structure
+
+- `configs/` configuration files
+- `src/modulation/` QPSK / 16QAM mapping
+- `src/channel/` Rayleigh + correlated channel models
+- `src/schemes/` Alamouti + SCIRS kernels
+- `src/pipeline/` simulation + experiment execution
+- `experiments/` reproducible experiment entrypoints
+- `results/` raw/processed output artifacts
+- `paper/` publication-ready figures and tables
+
+## 10. Environment Setup
 
 ```bash
 python -m venv .venv
@@ -37,128 +136,54 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## 4) Reproducibility Controls
+## 11. Run Experiments
 
-Primary controls are in `configs/base_config.yaml`:
-
-- `seeds`: list of random seeds for multi-run averaging
-- `n_symbols`: target symbols per SNR point
-- `max_errors`: early-stop threshold (minimum useful errors)
-- `snr_db`: SNR range grid
-- `parallel.enabled`, `parallel.workers`: multiprocessing switch
-
-Each experiment stores:
-
-- raw per-run logs in `results/raw/ber_logs/*.json`
-- aggregate per-SNR CSV in `results/processed/csv/*.csv`
-- NumPy arrays in `results/processed/numpy/*.npz`
-- generated BER plots in `results/plots/ber_curves/*.png`
-
-## 5) Simulation Methodology
-
-### 5.1 Statistical policy
-
-- BER/SER estimated per SNR point
-- mean aggregation across seeds
-- 95% confidence interval reported for BER (`ber_ci95`)
-- early stopping active once sufficient error events are collected
-
-### 5.2 Channel policy
-
-- flat Rayleigh fading (default)
-- correlated channel stress test via Toeplitz model:
-  `R_ij = rho^|i-j|`
-
-### 5.3 Scheme notes
-
-- MRC and Alamouti are implemented as classical baselines
-- SCIRS variants use coordinate interleaving + rotation + ML block detection
-
-## 6) Running Experiments
-
-### 6.1 Individual experiments
-
-```bash
-python experiments/exp_01_baseline_mrc.py
-python experiments/exp_03_scirs_2x1.py
-python experiments/exp_04_scirs_3x1.py
-```
-
-### 6.2 Full batch run
+### Full suite
 
 ```bash
 python experiments/run_all.py
 ```
 
-Optional flags:
+### Full suite + final figures + packaging
 
 ```bash
-python experiments/run_all.py --final-plots
-python experiments/run_all.py --paper-pack
 python experiments/run_all.py --final-plots --paper-pack --strict-pack
 ```
 
-## 7) Experiment Inventory
+## 12. Experiment Scripts
 
-- `exp_01_baseline_mrc.py`: baseline BER comparison (SISO/MRC/Alamouti)
-- `exp_02_alamouti.py`: focused Alamouti run
-- `exp_03_scirs_2x1.py`: SCIRS 2x1 BER/SER evaluation
-- `exp_04_scirs_3x1.py`: flagship SCIRS 3x1 vs MRC 3x1 comparison
-- `exp_05_correlated_channels.py`: robustness under `rho={0.0,0.5,0.9}`
-- `exp_06_rotation_sweep.py`: angle sweep and best-theta identification
-- `exp_07_complexity_analysis.py`: ML vs sphere runtime benchmark
-- `exp_08_constellation_visualization.py`: constellation geometry figure
-- `final_paper_plots.py`: polished, paper-ready composite plots
+- `exp_01_baseline_mrc.py`: baseline SISO/MRC/Alamouti
+- `exp_02_alamouti.py`: Alamouti-only reference
+- `exp_03_scirs_2x1.py`: SCIRS 2x1
+- `exp_04_scirs_3x1.py`: SCIRS 3x1 vs MRC 3x1
+- `exp_05_correlated_channels.py`: correlated stress test (MRC + SCIRS)
+- `exp_06_rotation_sweep.py`: BER vs rotation angle
+- `exp_07_complexity_analysis.py`: detector runtime comparison
+- `exp_08_constellation_visualization.py`: constellation geometry
+- `exp_09_main_comparison.py`: all core schemes on one BER figure
+- `exp_10_sanity_checks.py`: implementation sanity verification
+- `final_paper_plots.py`: polished paper figures from stored CSV/JSON
 
-## 8) Final Paper Artifacts
+## 13. Output Artifacts
 
-### 8.1 Generate polished figures
+Generated artifacts include:
 
-```bash
-python experiments/final_paper_plots.py
-```
+- raw logs: `results/raw/ber_logs/*.json`
+- aggregate curves: `results/processed/csv/*.csv`
+- numpy bundles: `results/processed/numpy/*.npz`
+- BER curves: `results/plots/ber_curves/*.png`
+- comparison figures: `results/plots/comparison/*.png`
+- paper figures: `paper/figures/*.png`
+- paper tables: `paper/tables/*.md`, `paper/tables/*.json`
+- pack manifest: `paper/manifest.json`
 
-Expected outputs (if source logs exist):
+## 14. Reproducibility Checklist
 
-- `paper/figures/Fig10_main_ber_comparison.png`
-- `paper/figures/Fig11_scirs3x1_gain.png`
-- `paper/figures/Fig12_correlation_robustness.png`
-- `paper/figures/Fig13_rotation_sweep.png`
-- `paper/figures/Fig14_complexity_comparison.png`
+Before reporting final numbers:
 
-### 8.2 Package and verify paper assets
-
-```bash
-python experiments/paper_pack.py
-python experiments/paper_pack.py --strict
-```
-
-- packaging manifest: `paper/manifest.json`
-
-## 9) Quality and Interpretation Guidance
-
-For research-grade confidence:
-
-- increase `n_symbols` beyond baseline defaults for high-SNR tails
-- ensure confidence intervals are narrow enough at target BER points
-- avoid over-interpreting single-seed trends
-- validate monotonic BER behavior before reporting coding-gain claims
-
-## 10) Notes for Extension
-
-Typical extension points:
-
-- add new modulation in `src/modulation/`
-- add new channel model in `src/channel/`
-- add new scheme with compatible transmit/receive interface in `src/schemes/`
-- add custom report logic in `src/pipeline/reporting.py`
-
-## 11) Recommended Reporting Checklist
-
-Before manuscript export:
-
-1. run full experiment suite
-2. regenerate final paper plots
-3. verify table/figure consistency with raw logs
-4. run strict paper pack to detect missing assets
-5. archive exact config files used for each reported figure
+1. lock config files used for each figure
+2. run sanity checks
+3. regenerate all experiments with fixed seeds
+4. regenerate final paper plots
+5. run strict paper packaging
+6. archive raw JSON logs with manuscript

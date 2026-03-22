@@ -3,7 +3,7 @@
   "rows": [
     {
       "scheme": "mrc_3x1",
-      "snr_at_target_ber": 16.854770353144946
+      "snr_at_target_ber": NaN
     },
     {
       "scheme": "scirs_3x1",

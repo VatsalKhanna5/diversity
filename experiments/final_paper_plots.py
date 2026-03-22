@@ -53,12 +53,12 @@ def _plot_curves(curves: list[dict], title: str, out_path: str, y_min: float = 1
 def main() -> None:
     curves_main = []
     for path in [
-        "results/processed/csv/baseline_siso.csv",
-        "results/processed/csv/baseline_mrc_2x1.csv",
-        "results/processed/csv/baseline_mrc_3x1.csv",
-        "results/processed/csv/baseline_alamouti_2x1.csv",
-        "results/processed/csv/exp03_scirs_2x1.csv",
-        "results/processed/csv/exp04_scirs_3x1.csv",
+        "results/processed/csv/exp09_siso.csv",
+        "results/processed/csv/exp09_mrc_2x1.csv",
+        "results/processed/csv/exp09_mrc_3x1.csv",
+        "results/processed/csv/exp09_alamouti_2x1.csv",
+        "results/processed/csv/exp09_scirs_2x1.csv",
+        "results/processed/csv/exp09_scirs_3x1.csv",
     ]:
         c = _load_csv_curve(path)
         if c is not None:
@@ -69,8 +69,8 @@ def main() -> None:
 
     curves_gain = []
     for path in [
-        "results/processed/csv/exp04_mrc_3x1.csv",
-        "results/processed/csv/exp04_scirs_3x1.csv",
+        "results/processed/csv/exp09_mrc_3x1.csv",
+        "results/processed/csv/exp09_scirs_3x1.csv",
     ]:
         c = _load_csv_curve(path)
         if c is not None:
