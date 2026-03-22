@@ -1,134 +1,298 @@
 # SCIRS Research Framework
 
-This repository implements a research-grade, reproducible Monte Carlo simulator for diversity systems over flat Rayleigh fading, including a mathematically correct implementation of SCIRS (Spatial-Coordinate Interleaved Rotated Signaling) with **joint ML detection**.
+This repository contains a reproducible simulation framework for studying diversity-oriented transmission schemes in flat-fading low-dimensional MISO channels, with emphasis on SCIRS (Spatial-Coordinate Interleaved Rotated Signaling). The codebase is organized as a research artifact rather than a demo project: the mathematical model, experiment definitions, result logs, and publication assets are all treated as first-class outputs.
 
-## 1. Research Objective
+The current implementation supports:
 
-Evaluate BER/SER performance of:
+- coherent SISO detection,
+- MRC-based transmit diversity baselines for `2x1` and `3x1`,
+- Alamouti `2x1` space-time block coding,
+- SCIRS `2x1` and `3x1` with joint maximum-likelihood detection,
+- i.i.d. and correlated Rayleigh fading,
+- reproducible Monte Carlo BER/SER experiments,
+- automated figure and table generation for manuscript preparation.
 
-- SISO
-- MRC (2x1, 3x1)
-- Alamouti (2x1)
-- SCIRS (2x1, 3x1)
+## Research Scope
 
-under:
+The main objective of this repository is to evaluate whether rotated and jointly decoded transmit vectors can provide useful reliability gains over conventional low-dimensional diversity baselines, while preserving a clean and auditable simulation workflow.
 
-- i.i.d. Rayleigh fading
-- correlated Rayleigh fading (`rho = 0, 0.5, 0.9`)
+The framework is designed to answer the following questions:
 
-for SNR range `0..30 dB`.
+1. Do the classical baselines behave as expected under the adopted channel and noise model?
+2. Does SCIRS exhibit physically meaningful BER decay only when implemented with joint vector detection?
+3. How sensitive are the resulting curves to transmit correlation and rotation angle?
+4. Is exhaustive ML detection practical for the problem sizes considered here?
+5. Which components of the present SCIRS realization are validated, and which still require further code-design research?
 
-## 2. Mathematical Model
+## Mathematical Model
 
-For an `Lx1` MISO channel:
+### Channel model
 
-- channel vector: `H = [h1, ..., hL]`
-- each `hi ~ CN(0,1)`
-- noise: `n ~ CN(0, N0)`
-- received signal: `y = Hx + n`
+We consider an `L x 1` flat-fading MISO system:
 
-Perfect CSI is assumed at the receiver.
-
-## 3. Critical SCIRS Rule
-
-SCIRS is **jointly encoded and jointly decoded**. It is not repetition coding.
-
-- Do not decode symbol coordinates independently.
-- Do not decode per symbol after rotation.
-- Perform ML detection over the **full transmitted symbol vector**.
-
-If implemented incorrectly, BER can saturate near random-guess levels.
-
-## 4. Modulation
-
-QPSK Gray mapping is implemented exactly as:
-
-- `(0,0) -> (1 + j)/sqrt(2)`
-- `(0,1) -> (-1 + j)/sqrt(2)`
-- `(1,1) -> (-1 - j)/sqrt(2)`
-- `(1,0) -> (1 - j)/sqrt(2)`
-
-Average symbol energy is normalized to 1.
-
-## 5. Scheme Implementations
-
-### 5.1 SISO
-
-- model: `y = h s + n`
-- detection: ML over QPSK constellation
-
-### 5.2 MRC (`Lx1`)
-
-- same symbol transmitted from all antennas
-- receive model: `y = sum_i h_i * s + n`
-- equivalent channel: `h_eff = sum_i h_i / sqrt(L)`
-- equalize then ML slice
-
-### 5.3 Alamouti (2x1)
-
-- standard orthogonal STBC:
-  - time 1: `[s1, s2]`
-  - time 2: `[-conj(s2), conj(s1)]`
-- linear combiner with known closed-form decoder
-
-### 5.4 SCIRS 2x1
-
-- symbol vector: `s = [s1, s2]^T`
-- rotated vector: `x = G s`, where
-  - `theta = 0.5 * arctan(2)`
-  - `G = [[cos(theta), -sin(theta)], [sin(theta), cos(theta)]]`
-- single-slot transmission across two antennas
-- joint ML over all `4^2 = 16` QPSK pairs
-
-### 5.5 SCIRS 3x1
-
-- symbol vector: `s = [s1, s2, s3]^T`
-- rotated using deterministic orthonormal `3x3` matrix
-- single-slot transmission across three antennas
-- joint ML over all `4^3 = 64` QPSK triples
-
-## 6. Statistics and Reliability
-
-Per SNR point:
-
-- simulate up to `n_symbols` (default `1e5`)
-- early-stop only after collecting at least `max_errors` (default `200`) bit errors
-- aggregate over multiple seeds
-- report BER mean, SER mean, BER standard deviation, and BER 95% CI
-
-## 7. Correlated Channel Model
-
-Correlation matrix:
-
-- `R_ij = rho^|i-j|`
-
-Channel generation uses Cholesky factorization of `R`.
-
-## 8. Sanity Checks
-
-Built-in checks verify:
-
-- high-SNR BER is low for all schemes
-- BER does not collapse to random-guess region
-
-Run:
-
-```bash
-python experiments/exp_10_sanity_checks.py
+```math
+y = \mathbf{h}\mathbf{x} + n = \sum_{i=1}^{L} h_i x_i + n
 ```
 
-## 9. Repository Structure
+where:
 
-- `configs/` configuration files
-- `src/modulation/` QPSK / 16QAM mapping
-- `src/channel/` Rayleigh + correlated channel models
-- `src/schemes/` Alamouti + SCIRS kernels
-- `src/pipeline/` simulation + experiment execution
-- `experiments/` reproducible experiment entrypoints
-- `results/` raw/processed output artifacts
-- `paper/` publication-ready figures and tables
+- `\mathbf{h} = [h_1, h_2, ..., h_L]` is the channel vector,
+- `\mathbf{x}` is the transmitted vector,
+- `n ~ CN(0, N_0)` is complex Gaussian noise,
+- perfect CSI is assumed at the receiver.
 
-## 10. Environment Setup
+For independent fading:
+
+```math
+h_i \sim \mathcal{CN}(0,1)
+```
+
+For correlated fading, the transmit-side covariance matrix is:
+
+```math
+[\mathbf{R}]_{ij} = \rho^{|i-j|}
+```
+
+with `rho in {0, 0.5, 0.9}` in the current experiments. Correlated channels are generated by Cholesky factorization of `R`.
+
+### Modulation
+
+The main study uses Gray-coded QPSK with unit average symbol energy:
+
+```math
+(0,0) \mapsto \frac{1+j}{\sqrt{2}}, \quad
+(0,1) \mapsto \frac{-1+j}{\sqrt{2}}, \quad
+(1,1) \mapsto \frac{-1-j}{\sqrt{2}}, \quad
+(1,0) \mapsto \frac{1-j}{\sqrt{2}}.
+```
+
+This mapping is implemented exactly in [src/modulation/qpsk.py](D:/diversity/src/modulation/qpsk.py).
+
+## Scheme Definitions
+
+### SISO
+
+The SISO reference uses:
+
+```math
+y = hs + n
+```
+
+The receiver performs coherent equalization followed by ML slicing over the QPSK constellation.
+
+### MRC (`L x 1`)
+
+For the MRC baseline, the same symbol is transmitted from all antennas with power normalization:
+
+```math
+\mathbf{x} = \frac{s}{\sqrt{L}} [1,1,\dots,1]^T
+```
+
+which yields the effective model:
+
+```math
+y = \frac{s}{\sqrt{L}}\sum_{i=1}^{L} h_i + n
+```
+
+The effective channel is:
+
+```math
+h_{\text{eff}} = \frac{1}{\sqrt{L}} \sum_{i=1}^{L} h_i
+```
+
+and detection proceeds by equalization plus nearest-neighbor slicing.
+
+### Alamouti (`2 x 1`)
+
+The standard Alamouti block code transmits:
+
+```math
+\mathbf{X} =
+\begin{bmatrix}
+s_1 & s_2 \\
+-s_2^* & s_1^*
+\end{bmatrix}
+```
+
+over two time slots. Because the design is orthogonal, the receiver forms the standard sufficient statistics and then slices the resulting symbol estimates.
+
+### SCIRS `2 x 1`
+
+SCIRS must be implemented as a joint vector code. Two information symbols are grouped into:
+
+```math
+\mathbf{s} = [s_1, s_2]^T
+```
+
+and rotated with:
+
+```math
+\mathbf{G}_2 =
+\begin{bmatrix}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{bmatrix},
+\qquad
+\theta = \frac{1}{2}\tan^{-1}(2)
+```
+
+The transmitted vector is:
+
+```math
+\mathbf{x} = \mathbf{G}_2 \mathbf{s}
+```
+
+and the receive model is:
+
+```math
+y = \mathbf{h}\mathbf{G}_2\mathbf{s} + n
+```
+
+Detection is joint over all `4^2 = 16` QPSK pairs:
+
+```math
+\hat{\mathbf{s}} =
+\arg\min_{\mathbf{s}_c \in \mathcal{S}^2}
+\left| y - \mathbf{h}\mathbf{G}_2\mathbf{s}_c \right|^2
+```
+
+This is a central design rule of the repository: SCIRS is not decoded symbol-wise.
+
+### SCIRS `3 x 1`
+
+For the current `3 x 1` implementation:
+
+```math
+\mathbf{s} = [s_1, s_2, s_3]^T, \qquad \mathbf{x} = \mathbf{G}_3 \mathbf{s}
+```
+
+where `G_3` is presently a deterministic orthonormal `3 x 3` matrix derived from QR decomposition of a fixed matrix. The receive model is:
+
+```math
+y = \mathbf{h}\mathbf{G}_3\mathbf{s} + n
+```
+
+and joint ML detection is performed over all `4^3 = 64` QPSK triples:
+
+```math
+\hat{\mathbf{s}} =
+\arg\min_{\mathbf{s}_c \in \mathcal{S}^3}
+\left| y - \mathbf{h}\mathbf{G}_3\mathbf{s}_c \right|^2
+```
+
+The current `3 x 1` result should be interpreted as a validated software baseline for future rotation optimization, not yet as a final product-distance-optimal SCIRS design.
+
+## Why Joint Detection Matters
+
+If the transmit vector is rotated jointly but decoded component-wise, the receiver is solving the wrong estimation problem. The correct codeword distance between candidates `\mathbf{s}_a` and `\mathbf{s}_b` is:
+
+```math
+d^2(\mathbf{s}_a, \mathbf{s}_b) =
+\left|
+\mathbf{h}\mathbf{G}(\mathbf{s}_a - \mathbf{s}_b)
+\right|^2
+```
+
+This depends on the full symbol vector, not on each coordinate independently. Incorrect symbol-wise approximations can lead to flat or misleading BER curves. The current framework was explicitly built to avoid that failure mode.
+
+## Experimental Methodology
+
+### Monte Carlo protocol
+
+For each SNR point:
+
+- simulate up to `n_symbols` symbols, default `1e5`,
+- stop early once at least `max_errors` bit errors are collected, default `200`,
+- repeat across multiple seeds,
+- compute BER and SER means,
+- compute BER standard deviation and 95% confidence interval.
+
+If `N_e` bit errors occur over `N_b` observed bits:
+
+```math
+\widehat{P_b} = \frac{N_e}{N_b}
+```
+
+If `N_{se}` symbol errors occur over `N_s` observed symbols:
+
+```math
+\widehat{P_s} = \frac{N_{se}}{N_s}
+```
+
+Across seeds, the framework stores the sample mean and standard deviation, and reports:
+
+```math
+\Delta_{95} = 1.96 \frac{s_b}{\sqrt{K}}
+```
+
+for `K` seed-level runs.
+
+### Current experiment suite
+
+- `exp_01_baseline_mrc.py`: classical baseline comparison
+- `exp_02_alamouti.py`: focused Alamouti reference
+- `exp_03_scirs_2x1.py`: SCIRS `2x1`
+- `exp_04_scirs_3x1.py`: SCIRS `3x1` vs MRC `3x1`
+- `exp_05_correlated_channels.py`: correlated fading stress test
+- `exp_06_rotation_sweep.py`: angle sweep for SCIRS `2x1`
+- `exp_07_complexity_analysis.py`: ML vs sphere-style runtime comparison
+- `exp_08_constellation_visualization.py`: original vs rotated QPSK geometry
+- `exp_09_main_comparison.py`: all core schemes in one figure
+- `exp_10_sanity_checks.py`: implementation-level correctness checks
+- `final_paper_plots.py`: final paper figures generated from stored result files
+- `paper_pack.py`: packaging of figures and tables into paper-ready locations
+
+## Repository Structure
+
+The repository is organized as a research monorepo:
+
+```text
+configs/
+  base_config.yaml           Core simulation defaults
+  baseline.yaml              Baseline benchmark setup
+  scirs_2x1.yaml             SCIRS 2x1 configuration
+  scirs_3x1.yaml             SCIRS 3x1 configuration
+
+src/
+  modulation/                QPSK and 16-QAM mapping
+  channel/                   Rayleigh, correlated fading, AWGN
+  schemes/                   MRC, Alamouti, SCIRS kernels, rotations
+  receiver/                  Detector utilities and metrics
+  pipeline/                  Simulation engine, aggregation, reporting
+  utils/                     Configuration, logging, plotting, seeding
+
+experiments/
+  exp_*.py                   Reproducible experiment entry points
+  run_all.py                 Full experiment orchestration
+  final_paper_plots.py       Composite publication figures
+  paper_pack.py              Paper asset collection
+
+results/
+  raw/                       Per-experiment JSON logs
+  processed/csv/             Aggregate BER/SER tables
+  processed/numpy/           NumPy bundles for reuse
+  plots/ber_curves/          Per-experiment BER figures
+  plots/comparison/          Comparison plots
+  plots/constellation/       Signal-space plots
+
+paper/
+  figures/                   Paper-ready figures
+  tables/                    Paper-ready markdown and JSON tables
+  manifest.json              Artifact packaging manifest
+```
+
+### Important source files
+
+- [src/pipeline/simulate.py](D:/diversity/src/pipeline/simulate.py): main Monte Carlo engine
+- [src/pipeline/experiment_runner.py](D:/diversity/src/pipeline/experiment_runner.py): per-experiment execution, aggregation, plotting
+- [src/schemes/scirs_2x1.py](D:/diversity/src/schemes/scirs_2x1.py): SCIRS `2x1` codebook generation and joint ML
+- [src/schemes/scirs_3x1.py](D:/diversity/src/schemes/scirs_3x1.py): SCIRS `3x1` codebook generation and joint ML
+- [src/channel/correlated.py](D:/diversity/src/channel/correlated.py): correlated fading generator
+- [src/modulation/qpsk.py](D:/diversity/src/modulation/qpsk.py): exact Gray-coded QPSK implementation
+
+## Installation
+
+Use a clean virtual environment:
 
 ```bash
 python -m venv .venv
@@ -136,54 +300,107 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## 11. Run Experiments
+## Running the Experiments
 
-### Full suite
+### Run the full experiment suite
 
 ```bash
 python experiments/run_all.py
 ```
 
-### Full suite + final figures + packaging
+### Run the full suite and regenerate publication assets
 
 ```bash
 python experiments/run_all.py --final-plots --paper-pack --strict-pack
 ```
 
-## 12. Experiment Scripts
+### Run a single experiment
 
-- `exp_01_baseline_mrc.py`: baseline SISO/MRC/Alamouti
-- `exp_02_alamouti.py`: Alamouti-only reference
-- `exp_03_scirs_2x1.py`: SCIRS 2x1
-- `exp_04_scirs_3x1.py`: SCIRS 3x1 vs MRC 3x1
-- `exp_05_correlated_channels.py`: correlated stress test (MRC + SCIRS)
-- `exp_06_rotation_sweep.py`: BER vs rotation angle
-- `exp_07_complexity_analysis.py`: detector runtime comparison
-- `exp_08_constellation_visualization.py`: constellation geometry
-- `exp_09_main_comparison.py`: all core schemes on one BER figure
-- `exp_10_sanity_checks.py`: implementation sanity verification
-- `final_paper_plots.py`: polished paper figures from stored CSV/JSON
+```bash
+python experiments/exp_03_scirs_2x1.py
+```
 
-## 13. Output Artifacts
+## Output Artifacts
 
-Generated artifacts include:
+The framework stores all outputs as research artifacts:
 
 - raw logs: `results/raw/ber_logs/*.json`
-- aggregate curves: `results/processed/csv/*.csv`
-- numpy bundles: `results/processed/numpy/*.npz`
+- aggregate tables: `results/processed/csv/*.csv`
+- NumPy summaries: `results/processed/numpy/*.npz`
 - BER curves: `results/plots/ber_curves/*.png`
 - comparison figures: `results/plots/comparison/*.png`
+- constellation figures: `results/plots/constellation/*.png`
 - paper figures: `paper/figures/*.png`
 - paper tables: `paper/tables/*.md`, `paper/tables/*.json`
-- pack manifest: `paper/manifest.json`
+- packaging manifest: `paper/manifest.json`
 
-## 14. Reproducibility Checklist
+## Reproducibility Guidelines
 
-Before reporting final numbers:
+Before using any result in a manuscript or presentation:
 
-1. lock config files used for each figure
-2. run sanity checks
-3. regenerate all experiments with fixed seeds
-4. regenerate final paper plots
-5. run strict paper packaging
-6. archive raw JSON logs with manuscript
+1. Fix the exact config file used for the experiment.
+2. Keep the seed list unchanged across reruns.
+3. Re-run the sanity checks.
+4. Regenerate final figures from stored CSV and JSON outputs.
+5. Verify that the paper figures match the underlying raw logs.
+6. Archive both raw logs and processed summaries with the manuscript.
+
+## Sanity Checks
+
+The repository includes an implementation-level sanity script:
+
+```bash
+python experiments/exp_10_sanity_checks.py
+```
+
+This script verifies, at minimum:
+
+- low BER at high SNR for all implemented schemes,
+- absence of random-guess-like behavior,
+- basic numerical consistency of the current detector stack.
+
+## Current Research Interpretation
+
+The current repository should be understood as a validated simulation platform with an actively evolving SCIRS code design.
+
+What is already established:
+
+- the classical baselines are implemented consistently,
+- SCIRS `2x1` and `3x1` are now detected jointly and correctly,
+- the BER curves are physically meaningful and reproducible,
+- the experiment pipeline is suitable for manuscript generation.
+
+What still remains open:
+
+- stronger `3x3` rotation design for SCIRS `3x1`,
+- deeper product-distance optimization,
+- extension to higher-order constellations after QPSK design is stabilized,
+- tighter analytical performance bounds for the current and future SCIRS variants.
+
+## Repository URL
+
+If this project is released publicly, add the GitHub repository URL here and in the manuscript:
+
+```text
+https://github.com/<organization-or-user>/<repository-name>
+```
+
+No repository URL is currently stored in this local workspace.
+
+## License
+
+This project is intended to be released under the MIT License.
+
+A placeholder MIT license template has been added at:
+
+- [LICENSE](D:/diversity/LICENSE)
+
+Update the copyright holder and year before publication or distribution.
+
+## Citation
+
+If you use this repository in academic work, cite:
+
+- the accompanying manuscript in [paper.tex](D:/diversity/paper.tex)
+- the public repository URL once assigned
+- the primary theoretical references used by the implementation and paper
